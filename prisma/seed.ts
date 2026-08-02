@@ -308,8 +308,8 @@ async function main() {
   }
 
   // Initial admin user
-  const email = process.env.SEED_ADMIN_EMAIL ?? 'admin@fuma.local';
-  const password = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe_Str0ng!';
+  const email = process.env.SEED_ADMIN_EMAIL ?? 'admin@fumalounge.ru';
+  const password = process.env.SEED_ADMIN_PASSWORD ?? 'FumaLounge2025!';
   const passwordHash = await hashPassword(password);
   await prisma.adminUser.upsert({
     where: { email },

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { Security2FA } from '@/components/admin/Security2FA';
+import { ChangePassword } from '@/components/admin/ChangePassword';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,10 @@ export default async function SecurityPage() {
 
   return (
     <AdminShell email={session.email} active="security">
-      <Security2FA enabled={user?.totpEnabled ?? false} />
+      <div className="mx-auto flex max-w-lg flex-col gap-6">
+        <ChangePassword />
+        <Security2FA enabled={user?.totpEnabled ?? false} />
+      </div>
     </AdminShell>
   );
 }
