@@ -1,8 +1,9 @@
 import { getMenuTree } from '@/lib/menu';
 import { MenuExperience } from '@/components/menu/MenuExperience';
 
-// Menu is served fresh-ish; admin mutations call revalidatePath('/').
-export const revalidate = 300;
+// Rendered per request (needs the database) — no build-time prerender,
+// and menu edits appear instantly.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const categories = await getMenuTree();
