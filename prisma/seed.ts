@@ -7,7 +7,13 @@
  */
 import { PrismaClient, CategoryKind, AdminRole } from '@prisma/client';
 import argon2 from 'argon2';
-import { generatePlaceholderImage } from '../src/lib/images';
+import { readFile, access } from 'node:fs/promises';
+import path from 'node:path';
+import {
+  generatePlaceholderImage,
+  processProductImage,
+  type ProcessedImage,
+} from '../src/lib/images';
 import { slugify } from '../src/lib/utils';
 
 async function hashPassword(password: string): Promise<string> {
@@ -20,6 +26,32 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 const prisma = new PrismaClient();
+
+// Directory where you can drop real product photos named by product slug,
+// e.g. prisma/seed-images/coca-cola.jpg. Supported: jpg/jpeg/png/webp/avif.
+const SEED_IMAGES_DIR = path.join(process.cwd(), 'prisma', 'seed-images');
+const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
+
+/**
+ * Use a real photo from prisma/seed-images/<slug>.<ext> when present
+ * (auto-cropped to square + WebP + thumbnail + LQIP); otherwise fall back
+ * to a premium generated placeholder.
+ */
+async function resolveImage(name: string, hue: Hue): Promise<ProcessedImage> {
+  const slug = slugify(name);
+  for (const ext of IMAGE_EXTS) {
+    const file = path.join(SEED_IMAGES_DIR, `${slug}${ext}`);
+    try {
+      await access(file);
+      const buffer = await readFile(file);
+      console.log(`  🖼  real photo: ${slug}${ext}`);
+      return await processProductImage(buffer);
+    } catch {
+      /* not found — try next extension */
+    }
+  }
+  return generatePlaceholderImage(name, hue);
+}
 
 type Hue = 'gold' | 'amber' | 'cool';
 
@@ -220,7 +252,7 @@ async function main() {
 
       let prodOrder = 0;
       for (const p of child.products ?? []) {
-        const img = await generatePlaceholderImage(p.name, p.hue ?? 'gold');
+        const img = await resolveImage(p.name, p.hue ?? 'gold');
         const product = await prisma.product.create({
           data: {
             categoryId: childCat.id,
