@@ -68,7 +68,9 @@ export async function setSessionCookie(token: string): Promise<void> {
   const store = await cookies();
   store.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: env.IS_PROD,
+    // Secure cookies require HTTPS. Derive from the public site URL so that
+    // plain-HTTP deployments (e.g. access by bare IP) can still log in.
+    secure: env.SITE_URL.startsWith('https://'),
     sameSite: 'lax',
     path: '/',
     maxAge: MAX_AGE,
