@@ -13,6 +13,7 @@ import {
   generatePlaceholderImage,
   processProductImage,
   type ProcessedImage,
+  type PlaceholderIcon,
 } from '../src/lib/images';
 import { slugify } from '../src/lib/utils';
 
@@ -37,7 +38,11 @@ const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
  * (auto-cropped to square + WebP + thumbnail + LQIP); otherwise fall back
  * to a premium generated placeholder.
  */
-async function resolveImage(name: string, hue: Hue): Promise<ProcessedImage> {
+async function resolveImage(
+  name: string,
+  hue: Hue,
+  icon: PlaceholderIcon,
+): Promise<ProcessedImage> {
   const slug = slugify(name);
   for (const ext of IMAGE_EXTS) {
     const file = path.join(SEED_IMAGES_DIR, `${slug}${ext}`);
@@ -50,7 +55,19 @@ async function resolveImage(name: string, hue: Hue): Promise<ProcessedImage> {
       /* not found — try next extension */
     }
   }
-  return generatePlaceholderImage(name, hue);
+  return generatePlaceholderImage(name, icon, hue);
+}
+
+/** Map a subcategory name to a themed placeholder icon. */
+function iconForCategory(categoryName: string): PlaceholderIcon {
+  const n = categoryName.toLowerCase();
+  if (n.includes('кофе')) return 'coffee';
+  if (n.includes('церемони')) return 'ceremony';
+  if (n.includes('чай')) return 'tea';
+  if (n.includes('вода')) return 'water';
+  if (n.includes('газиров')) return 'soda';
+  if (n.includes('лимонад')) return 'lemonade';
+  return 'default';
 }
 
 type Hue = 'gold' | 'amber' | 'cool';
@@ -250,9 +267,10 @@ async function main() {
         },
       });
 
+      const icon = iconForCategory(child.name);
       let prodOrder = 0;
       for (const p of child.products ?? []) {
-        const img = await resolveImage(p.name, p.hue ?? 'gold');
+        const img = await resolveImage(p.name, p.hue ?? 'gold', icon);
         const product = await prisma.product.create({
           data: {
             categoryId: childCat.id,
