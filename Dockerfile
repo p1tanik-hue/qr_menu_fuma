@@ -25,7 +25,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
-RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+# openssl for Prisma; fontconfig + serif fonts so sharp/librsvg can render
+# text on generated placeholder images (removes the "Fontconfig error").
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl fontconfig fonts-dejavu-core \
   && rm -rf /var/lib/apt/lists/* \
   && groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -m nextjs
 
