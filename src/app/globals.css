@@ -19,13 +19,16 @@
     scroll-behavior: smooth;
     scroll-padding-top: 7.5rem; /* keep anchors below sticky nav */
     -webkit-text-size-adjust: 100%;
+    /* Prevent any horizontal scroll on every device (root-level guard). */
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-ink text-sand font-sans antialiased;
-    /* Prevent any horizontal scroll on every device. */
     overflow-x: hidden;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
     background-image: radial-gradient(
         90% 60% at 50% -10%,
         rgba(201, 165, 92, 0.08) 0%,

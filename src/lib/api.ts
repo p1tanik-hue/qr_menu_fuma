@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession, type SessionPayload } from './auth';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { MENU_CACHE_TAG } from './menu';
 
 /** JSON helpers */
 export function ok<T>(data: T, init?: ResponseInit) {
@@ -25,5 +26,6 @@ export async function guard(): Promise<SessionPayload | NextResponse> {
 
 /** Revalidate the public menu after a mutation so changes appear instantly. */
 export function revalidateMenu() {
+  revalidateTag(MENU_CACHE_TAG);
   revalidatePath('/');
 }

@@ -1,6 +1,9 @@
 import 'server-only';
+import { unstable_cache } from 'next/cache';
 import { prisma } from './db';
 import type { CategoryDTO, ProductDTO } from './types';
+
+export const MENU_CACHE_TAG = 'menu';
 
 const productInclude = {
   variants: { orderBy: { sortOrder: 'asc' } },
@@ -58,7 +61,7 @@ function mapProduct(p: {
  * top-level categories -> child categories -> products.
  * Products directly attached to a top-level category are included too.
  */
-export async function getMenuTree(): Promise<CategoryDTO[]> {
+async function fetchMenuTree(): Promise<CategoryDTO[]> {
   const categories = await prisma.category.findMany({
     where: { isActive: true, parentId: null },
     orderBy: { sortOrder: 'asc' },
@@ -102,6 +105,16 @@ export async function getMenuTree(): Promise<CategoryDTO[]> {
     })),
   }));
 }
+
+/**
+ * Public menu tree, cached across requests and revalidated by tag on any
+ * admin mutation (see revalidateMenu). Keeps the page fast even though it is
+ * rendered dynamically.
+ */
+export const getMenuTree = unstable_cache(fetchMenuTree, ['menu-tree'], {
+  tags: [MENU_CACHE_TAG],
+  revalidate: 300,
+});
 
 // ── Admin data (includes inactive items + full detail) ─────────────────
 export interface AdminCategory {

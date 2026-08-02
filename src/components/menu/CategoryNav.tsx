@@ -58,7 +58,7 @@ export function CategoryNav({
           aria-label="Наверх"
           className="shrink-0"
         >
-          <Logo subtitle={false} className="scale-90" />
+          <Logo subtitle={false} size="sm" />
         </button>
         <div
           ref={navRef}

@@ -99,7 +99,7 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Logo className="scale-125" />
+          <Logo size="lg" />
           <p className="mx-auto mt-5 max-w-md text-sm font-light leading-relaxed tracking-wide text-sand-muted">
             Премиальная кальянная. Авторский чай, кофе и натуральные лимонады.
           </p>
@@ -209,7 +209,7 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
       </div>
 
       <footer className="mt-16 border-t border-gold/10 px-4 py-8 text-center">
-        <Logo subtitle className="scale-90 opacity-80" />
+        <Logo subtitle size="sm" className="opacity-80" />
         <p className="mt-4 text-xs text-sand-muted">
           © {new Date().getFullYear()} FUMA LOUNGE. Все права защищены.
         </p>

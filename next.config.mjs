@@ -5,10 +5,12 @@ const nextConfig = {
   compress: true,
   output: 'standalone',
   images: {
+    // Uploaded images are already optimized WebP (+ thumbnails) by the
+    // sharp pipeline, so we serve them directly. This avoids on-demand
+    // re-optimization (heavy CPU) on small VPS and makes first load fast.
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      { protocol: 'https', hostname: '**' },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
     deviceSizes: [360, 420, 640, 768, 1024, 1280, 1536],
     imageSizes: [96, 128, 200, 256, 384],
   },
