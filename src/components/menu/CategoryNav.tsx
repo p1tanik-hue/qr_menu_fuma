@@ -42,12 +42,17 @@ export function CategoryNav({
     return () => observer.disconnect();
   }, [items]);
 
-  // Keep the active chip scrolled into view within the nav.
+  // Keep the active chip centered within the nav — scroll ONLY the chip
+  // container horizontally, never the page (scrollIntoView would also move
+  // the whole document vertically and yank the user back up).
   useEffect(() => {
-    const chip = navRef.current?.querySelector<HTMLElement>(
-      `[data-slug="${active}"]`,
-    );
-    chip?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    const container = navRef.current;
+    if (!container) return;
+    const chip = container.querySelector<HTMLElement>(`[data-slug="${active}"]`);
+    if (!chip) return;
+    const offset =
+      chip.offsetLeft - container.clientWidth / 2 + chip.clientWidth / 2;
+    container.scrollTo({ left: offset, behavior: 'smooth' });
   }, [active]);
 
   return (
