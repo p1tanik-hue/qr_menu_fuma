@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fuma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fuma_password}
+      POSTGRES_DB: ${POSTGRES_DB:-fuma}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-fuma}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Not exposed publicly by default — only the app talks to it.
+    expose:
+      - '5432'
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fuma}:${POSTGRES_PASSWORD:-fuma_password}@db:5432/${POSTGRES_DB:-fuma}?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NEXT_PUBLIC_RESTAURANT_NAME: ${NEXT_PUBLIC_RESTAURANT_NAME:-FUMA LOUNGE}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@fuma.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe_Str0ng!}
+      MAX_LOGIN_ATTEMPTS: ${MAX_LOGIN_ATTEMPTS:-5}
+      LOGIN_LOCK_MINUTES: ${LOGIN_LOCK_MINUTES:-15}
+      RUN_SEED: ${RUN_SEED:-false}
+      NODE_ENV: production
+    volumes:
+      # Persist user-uploaded images across deploys.
+      - uploads:/app/public/uploads
+    ports:
+      - '3000:3000'
+
+volumes:
+  db-data:
+  uploads:

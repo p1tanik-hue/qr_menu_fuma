@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Premium font stacks — no network fetch, zero layout shift. */
+  --font-display: 'Cormorant Garamond', 'Playfair Display', Georgia,
+    'Times New Roman', serif;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 7.5rem; /* keep anchors below sticky nav */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink text-sand font-sans antialiased;
+    /* Prevent any horizontal scroll on every device. */
+    overflow-x: hidden;
+    max-width: 100vw;
+    background-image: radial-gradient(
+        90% 60% at 50% -10%,
+        rgba(201, 165, 92, 0.08) 0%,
+        rgba(14, 14, 14, 0) 55%
+      ),
+      linear-gradient(180deg, #0e0e0e 0%, #0a0a0a 100%);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+
+  ::selection {
+    background: rgba(201, 165, 92, 0.3);
+    color: #fff;
+  }
+
+  /* Slim gold scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(#c9a55c, #a9863f);
+    border-radius: 8px;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .gold-text {
+    @apply bg-gold-sheen bg-clip-text text-transparent;
+  }
+
+  .gold-divider {
+    height: 1px;
+    @apply bg-gold-line;
+  }
+
+  /* Glassmorphism, used very sparingly. */
+  .glass {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    border: 1px solid rgba(201, 165, 92, 0.14);
+  }
+
+  .card-surface {
+    background: linear-gradient(160deg, #181818 0%, #101010 100%);
+    border: 1px solid rgba(201, 165, 92, 0.12);
+  }
+
+  .btn-gold {
+    @apply bg-gold-sheen text-ink font-semibold transition-transform duration-300 ease-premium;
+  }
+  .btn-gold:active {
+    transform: scale(0.97);
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-gold/20 bg-ink-900 px-3 py-2.5 text-sm text-sand outline-none transition-colors duration-200 placeholder:text-sand-muted/60 focus:border-gold/60;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #141414 25%,
+      #1e1e1e 37%,
+      #141414 63%
+    );
+    background-size: 400% 100%;
+    @apply animate-shimmer;
+  }
+}

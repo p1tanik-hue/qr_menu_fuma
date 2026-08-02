@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log
+Dockerfile
+.dockerignore
+docker-compose.yml
+README.md
+.env
+.env*.local
+public/uploads/*
+!public/uploads/.gitkeep
+docker-data
+*.md
+.vscode

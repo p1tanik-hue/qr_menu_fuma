@@ -1,0 +1,180 @@
+// FUMA LOUNGE — Premium QR Menu
+// Prisma schema. All menu data lives in the database (never in code/JSON).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Multi-restaurant ready ─────────────────────────────────────────────
+model Restaurant {
+  id         String     @id @default(cuid())
+  slug       String     @unique
+  name       String
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  categories Category[]
+  tables     RestaurantTable[]
+}
+
+// Category kind — future proof for food / hookah / bar / wine cards etc.
+enum CategoryKind {
+  DRINK_HOT
+  DRINK_COLD
+  FOOD
+  HOOKAH
+  BAR
+  WINE
+  OTHER
+}
+
+// ── Categories (supports nesting: e.g. "Горячие напитки" -> "Кофе"/"Чай") ─
+model Category {
+  id           String       @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  parentId     String?
+  parent       Category?    @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children     Category[]   @relation("CategoryTree")
+
+  slug         String
+  name         String
+  description  String?
+  emoji        String?       // e.g. "☕" / "🥤"
+  kind         CategoryKind @default(OTHER)
+  sortOrder    Int          @default(0)
+  isActive     Boolean      @default(true)
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  products     Product[]
+
+  @@unique([restaurantId, slug])
+  @@index([restaurantId, parentId, sortOrder])
+}
+
+// ── Products ───────────────────────────────────────────────────────────
+model Product {
+  id           String           @id @default(cuid())
+  categoryId   String
+  category     Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  slug         String
+  name         String
+  description  String?
+  imageUrl     String?          // WebP served from /uploads
+  thumbUrl     String?          // small WebP thumbnail
+  blurData     String?          // base64 LQIP placeholder
+
+  isActive     Boolean          @default(true)
+  isFeatured   Boolean          @default(false)
+  sortOrder    Int              @default(0)
+
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  variants     ProductVariant[]
+  addons       ProductAddon[]
+
+  @@index([categoryId, sortOrder])
+  @@index([name])
+}
+
+// One product may have several volumes/prices (330 / 500 / 1000 ml).
+model ProductVariant {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  label       String?  // optional override label, e.g. "без газа"
+  volume      Int?     // in ml
+  volumeUnit  String   @default("мл")
+  price       Int      // in RUB (integer, no fractional kopecks)
+  description String?  // per-variant description override
+  sortOrder   Int      @default(0)
+  isDefault   Boolean  @default(false)
+
+  @@index([productId, sortOrder])
+}
+
+// Optional add-ons (e.g. "Лимон +100 ₽").
+model Addon {
+  id        String         @id @default(cuid())
+  name      String
+  price     Int            @default(0)
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+
+  products  ProductAddon[]
+}
+
+model ProductAddon {
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addonId   String
+  addon     Addon   @relation(fields: [addonId], references: [id], onDelete: Cascade)
+
+  @@id([productId, addonId])
+}
+
+// ── Admin auth (Argon2 hashes, optional TOTP 2FA) ──────────────────────
+enum AdminRole {
+  OWNER
+  MANAGER
+}
+
+model AdminUser {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String
+  role           AdminRole @default(MANAGER)
+
+  totpSecret     String?   // set when 2FA enabled
+  totpEnabled    Boolean   @default(false)
+
+  failedAttempts Int       @default(0)
+  lockedUntil    DateTime?
+  lastLoginAt    DateTime?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Brute-force protection: track attempts per IP.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  email     String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
+
+// ── Site settings (key/value) ──────────────────────────────────────────
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ── Future features scaffolding (QR per table, waiter call, reviews) ────
+model RestaurantTable {
+  id           String   @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  number       String
+  qrToken      String   @unique @default(cuid())
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@unique([restaurantId, number])
+}
