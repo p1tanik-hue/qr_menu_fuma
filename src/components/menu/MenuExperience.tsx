@@ -27,12 +27,12 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
     [categories],
   );
 
+  // Emoji intentionally omitted for a stricter, more premium look.
   const navItems: NavItem[] = useMemo(
     () =>
       categories.map((c) => ({
         slug: c.slug,
         label: c.name,
-        emoji: c.emoji,
       })),
     [categories],
   );
@@ -43,7 +43,6 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
       ...subcategories.map((s) => ({
         id: s.id,
         label: s.name,
-        emoji: s.emoji,
       })),
     ],
     [subcategories],
@@ -173,7 +172,6 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
                   >
                     <div className="mb-6 flex items-center gap-3">
                       <h2 className="font-display text-2xl font-semibold text-sand sm:text-3xl">
-                        {top.emoji ? `${top.emoji} ` : ''}
                         {top.name}
                       </h2>
                       <div className="gold-divider flex-1" />

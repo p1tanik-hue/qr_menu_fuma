@@ -1,5 +1,22 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+
+// Premium self-hosted fonts (no external requests) with Cyrillic support.
+// Display: Playfair Display (luxury high-contrast serif). Body: Manrope.
+import '@fontsource/playfair-display/latin-500.css';
+import '@fontsource/playfair-display/latin-600.css';
+import '@fontsource/playfair-display/latin-700.css';
+import '@fontsource/playfair-display/cyrillic-500.css';
+import '@fontsource/playfair-display/cyrillic-600.css';
+import '@fontsource/playfair-display/cyrillic-700.css';
+import '@fontsource/manrope/latin-300.css';
+import '@fontsource/manrope/latin-400.css';
+import '@fontsource/manrope/latin-500.css';
+import '@fontsource/manrope/latin-600.css';
+import '@fontsource/manrope/cyrillic-300.css';
+import '@fontsource/manrope/cyrillic-400.css';
+import '@fontsource/manrope/cyrillic-500.css';
+import '@fontsource/manrope/cyrillic-600.css';
 import { env } from '@/lib/env';
 import { ServiceWorkerRegister } from '@/components/pwa/ServiceWorkerRegister';
 

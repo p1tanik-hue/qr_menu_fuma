@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 :root {
-  /* Premium font stacks — no network fetch, zero layout shift. */
-  --font-display: 'Cormorant Garamond', 'Playfair Display', Georgia,
-    'Times New Roman', serif;
+  /* Premium self-hosted fonts (see @fontsource imports in layout.tsx). */
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system,
     'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
