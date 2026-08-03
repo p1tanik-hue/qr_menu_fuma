@@ -42,17 +42,23 @@ export function CategoryNav({
     return () => observer.disconnect();
   }, [items]);
 
-  // Keep the active chip centered within the nav — scroll ONLY the chip
-  // container horizontally, never the page (scrollIntoView would also move
-  // the whole document vertically and yank the user back up).
+  // Bring the active chip into view within the nav ONLY if it is off-edge —
+  // scroll just the chip container horizontally (never the page), aligning to
+  // the nearest edge with padding. Never yanks an already-visible chip
+  // (which previously hid the first chip behind the logo).
   useEffect(() => {
     const container = navRef.current;
     if (!container) return;
     const chip = container.querySelector<HTMLElement>(`[data-slug="${active}"]`);
     if (!chip) return;
-    const offset =
-      chip.offsetLeft - container.clientWidth / 2 + chip.clientWidth / 2;
-    container.scrollTo({ left: offset, behavior: 'smooth' });
+    const c = container.getBoundingClientRect();
+    const r = chip.getBoundingClientRect();
+    const pad = 16;
+    if (r.left < c.left + pad) {
+      container.scrollBy({ left: r.left - c.left - pad, behavior: 'smooth' });
+    } else if (r.right > c.right - pad) {
+      container.scrollBy({ left: r.right - c.right + pad, behavior: 'smooth' });
+    }
   }, [active]);
 
   return (

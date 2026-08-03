@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { Fragment, useMemo, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { CategoryDTO, ProductDTO } from '@/lib/types';
 import { normalizeSearch } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { SearchBar } from './SearchBar';
 import { FilterChips, type FilterOption } from './FilterChips';
 import { ProductCard } from './ProductCard';
 import { ProductModal } from './ProductModal';
+import { SectionDivider } from './SectionDivider';
 
 interface FlatProduct {
   product: ProductDTO;
@@ -155,52 +156,60 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-12"
             >
-              {categories.map((top) => {
-                const groups = top.children.length ? top.children : [top];
-                const visibleGroups =
-                  filter === 'all'
-                    ? groups
-                    : groups.filter((g) => g.id === filter);
-                if (visibleGroups.length === 0) return null;
+              {categories
+                .map((top) => {
+                  const groups = top.children.length ? top.children : [top];
+                  const visibleGroups =
+                    filter === 'all'
+                      ? groups
+                      : groups.filter((g) => g.id === filter);
+                  return { top, visibleGroups };
+                })
+                .filter(({ visibleGroups }) => visibleGroups.length > 0)
+                .map(({ top, visibleGroups }, ti) => (
+                  <Fragment key={top.id}>
+                    {ti > 0 && <SectionDivider className="my-1" />}
+                    <section
+                      id={`cat-${top.slug}`}
+                      data-cat-section
+                      className="scroll-mt-28"
+                    >
+                      <div className="mb-6 flex items-center gap-3">
+                        <h2 className="font-display text-2xl font-semibold text-sand sm:text-3xl">
+                          {top.name}
+                        </h2>
+                        <div className="gold-divider flex-1" />
+                      </div>
 
-                return (
-                  <section
-                    key={top.id}
-                    id={`cat-${top.slug}`}
-                    data-cat-section
-                    className="scroll-mt-28"
-                  >
-                    <div className="mb-6 flex items-center gap-3">
-                      <h2 className="font-display text-2xl font-semibold text-sand sm:text-3xl">
-                        {top.name}
-                      </h2>
-                      <div className="gold-divider flex-1" />
-                    </div>
-
-                    <div className="flex flex-col gap-9">
-                      {visibleGroups.map((group) => (
-                        <div key={group.id}>
-                          {top.children.length > 0 && (
-                            <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.2em] text-gold/80">
-                              {group.name}
-                            </h3>
-                          )}
-                          {group.products.length > 0 ? (
-                            <ProductGrid
-                              products={group.products}
-                              onOpen={openProduct}
-                            />
-                          ) : (
-                            <p className="text-sm text-sand-muted">
-                              Скоро появится.
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
+                      <div className="flex flex-col gap-8">
+                        {visibleGroups.map((group, gi) => (
+                          <Fragment key={group.id}>
+                            {gi > 0 && (
+                              <SectionDivider size="sm" className="opacity-80" />
+                            )}
+                            <div>
+                              {top.children.length > 0 && (
+                                <h3 className="mb-4 text-center text-xs font-medium uppercase tracking-[0.35em] text-gold/80">
+                                  {group.name}
+                                </h3>
+                              )}
+                              {group.products.length > 0 ? (
+                                <ProductGrid
+                                  products={group.products}
+                                  onOpen={openProduct}
+                                />
+                              ) : (
+                                <p className="text-sm text-sand-muted">
+                                  Скоро появится.
+                                </p>
+                              )}
+                            </div>
+                          </Fragment>
+                        ))}
+                      </div>
+                    </section>
+                  </Fragment>
+                ))}
             </motion.div>
           )}
         </AnimatePresence>

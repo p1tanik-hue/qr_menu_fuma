@@ -28,14 +28,23 @@
     width: 100%;
     max-width: 100%;
     position: relative;
+    min-height: 100dvh;
+  }
+
+  /* Stable fixed background layer — avoids the iOS Safari flicker/jank that
+     `background-attachment: fixed` causes while scrolling. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image: radial-gradient(
         90% 60% at 50% -10%,
         rgba(201, 165, 92, 0.08) 0%,
         rgba(14, 14, 14, 0) 55%
       ),
       linear-gradient(180deg, #0e0e0e 0%, #0a0a0a 100%);
-    background-attachment: fixed;
-    min-height: 100dvh;
   }
 
   h1, h2, h3, h4 {
