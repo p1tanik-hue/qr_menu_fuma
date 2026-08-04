@@ -7,7 +7,7 @@
  */
 import { PrismaClient, CategoryKind, AdminRole } from '@prisma/client';
 import argon2 from 'argon2';
-import { readFile, access } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import {
   generatePlaceholderImage,
@@ -33,10 +33,27 @@ const prisma = new PrismaClient();
 const SEED_IMAGES_DIR = path.join(process.cwd(), 'prisma', 'seed-images');
 const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
 
+// Read the seed-images directory once and map lowercased filename -> real
+// filename, so photo matching is case-insensitive (avoids "Baykala.jpg" vs
+// "baykala.jpg" mismatches on Linux).
+let seedImageMapCache: Map<string, string> | null = null;
+async function getSeedImageMap(): Promise<Map<string, string>> {
+  if (seedImageMapCache) return seedImageMapCache;
+  const map = new Map<string, string>();
+  try {
+    const files = await readdir(SEED_IMAGES_DIR);
+    for (const f of files) map.set(f.toLowerCase(), f);
+  } catch {
+    /* directory may not exist */
+  }
+  seedImageMapCache = map;
+  return map;
+}
+
 /**
  * Use a real photo from prisma/seed-images/<slug>.<ext> when present
  * (auto-cropped to square + WebP + thumbnail + LQIP); otherwise fall back
- * to a premium generated placeholder.
+ * to a premium generated placeholder. Matching is case-insensitive.
  */
 async function resolveImage(
   name: string,
@@ -44,15 +61,13 @@ async function resolveImage(
   icon: PlaceholderIcon,
 ): Promise<ProcessedImage> {
   const slug = slugify(name);
+  const map = await getSeedImageMap();
   for (const ext of IMAGE_EXTS) {
-    const file = path.join(SEED_IMAGES_DIR, `${slug}${ext}`);
-    try {
-      await access(file);
-      const buffer = await readFile(file);
-      console.log(`  🖼  real photo: ${slug}${ext}`);
+    const real = map.get(`${slug}${ext}`.toLowerCase());
+    if (real) {
+      const buffer = await readFile(path.join(SEED_IMAGES_DIR, real));
+      console.log(`  🖼  real photo: ${real}`);
       return await processProductImage(buffer);
-    } catch {
-      /* not found — try next extension */
     }
   }
   return generatePlaceholderImage(name, icon, hue);
