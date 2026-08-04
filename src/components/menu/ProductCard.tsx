@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import type { ProductDTO } from '@/lib/types';
 import { formatPrice, formatVolume } from '@/lib/utils';
 
@@ -20,15 +19,10 @@ export function ProductCard({
   const minPrice = Math.min(...product.variants.map((v) => v.price));
 
   return (
-    <motion.button
+    <button
       type="button"
       onClick={() => onOpen(product)}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
-      whileTap={{ scale: 0.98 }}
-      className="group card-surface relative flex w-full flex-col overflow-hidden rounded-2xl text-left shadow-soft transition-all duration-500 ease-premium hover:-translate-y-1 hover:border-gold/40 hover:shadow-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+      className="group card-surface relative flex w-full flex-col overflow-hidden rounded-2xl text-left shadow-soft transition-[transform,border-color,box-shadow] duration-500 ease-premium hover:-translate-y-1 hover:border-gold/40 hover:shadow-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 active:scale-[0.98]"
       aria-label={`${product.name}. Подробнее`}
     >
       <div className="relative aspect-square w-full overflow-hidden bg-ink-800">
@@ -38,10 +32,9 @@ export function ProductCard({
             alt={product.name}
             fill
             sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 240px"
-            placeholder={product.blurData ? 'blur' : 'empty'}
-            blurDataURL={product.blurData ?? undefined}
             className="object-cover transition-transform duration-700 ease-premium group-hover:scale-105"
-            loading={index < 4 ? 'eager' : 'lazy'}
+            loading={index < 6 ? 'eager' : 'lazy'}
+            decoding="async"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-gold/40">
@@ -82,6 +75,6 @@ export function ProductCard({
           </span>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 }

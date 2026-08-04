@@ -94,17 +94,15 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
     <main className="min-h-dvh pb-24">
       {/* Hero */}
       <header className="relative flex flex-col items-center px-4 pt-12 pb-6 text-center sm:pt-16">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
+        {/* CSS entrance (not Framer) — animates from the first paint, so no
+            SSR→hydration flash/flicker. */}
+        <div className="animate-fade-up">
           <Logo size="lg" />
           <p className="mx-auto mt-5 max-w-md text-sm font-light leading-relaxed tracking-wide text-sand-muted">
             Премиальная кальянная. Авторский чай, кофе и натуральные лимонады.
           </p>
           <div className="gold-divider mx-auto mt-6 w-40" />
-        </motion.div>
+        </div>
       </header>
 
       <CategoryNav items={navItems} onJump={handleJump} />
@@ -122,8 +120,9 @@ export function MenuExperience({ categories }: { categories: CategoryDTO[] }) {
           )}
         </div>
 
-        {/* Content */}
-        <AnimatePresence mode="wait">
+        {/* Content — initial={false} so nothing fades in on first load
+            (prevents the SSR→hydration flicker); animates only on switches. */}
+        <AnimatePresence mode="wait" initial={false}>
           {isSearching ? (
             <motion.section
               key="search"
