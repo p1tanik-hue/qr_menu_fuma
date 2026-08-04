@@ -43,6 +43,7 @@ self.addEventListener('fetch', (event) => {
   // Cache-first for static assets and uploaded images.
   const isAsset =
     url.pathname.startsWith('/_next/static') ||
+    url.pathname.startsWith('/media') ||
     url.pathname.startsWith('/uploads') ||
     url.pathname.startsWith('/icons') ||
     /\.(?:css|js|png|jpg|jpeg|webp|avif|svg|woff2?)$/.test(url.pathname);

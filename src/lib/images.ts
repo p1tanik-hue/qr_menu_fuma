@@ -4,7 +4,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
-const PUBLIC_PREFIX = '/uploads';
+// Served via the /media/[file] route handler (see src/app/media) — NOT as a
+// Next static file, because `next start` doesn't serve runtime-written files.
+const PUBLIC_PREFIX = '/media';
 
 export interface ProcessedImage {
   imageUrl: string; // full-size WebP
@@ -246,8 +248,9 @@ export async function generatePlaceholderImage(
 
 /** Delete previously stored upload files (best-effort). */
 export async function deleteUpload(url?: string | null): Promise<void> {
-  if (!url || !url.startsWith(PUBLIC_PREFIX)) return;
-  const fileName = url.slice(PUBLIC_PREFIX.length + 1);
+  // Accept both current (/media/...) and legacy (/uploads/...) URLs.
+  if (!url || !(url.startsWith('/media/') || url.startsWith('/uploads/'))) return;
+  const fileName = path.basename(url);
   if (!fileName || fileName.includes('..')) return;
   try {
     await unlink(path.join(UPLOAD_DIR, fileName));
