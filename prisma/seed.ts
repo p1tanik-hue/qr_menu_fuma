@@ -191,13 +191,16 @@ const menu: SeedTop[] = [
         emoji: '💧',
         products: [
           {
-            name: 'Жемчужина Байкала',
+            name: 'Жемчужина Байкала без газа',
             hue: 'cool',
-            description: 'Природная байкальская вода в стекле.',
-            variants: [
-              { label: 'Без газа', volume: 530, price: 590, isDefault: true, description: 'Природная байкальская вода без газа.' },
-              { label: 'Газированная', volume: 530, price: 590, description: 'Природная байкальская вода, газированная.' },
-            ],
+            description: 'Природная байкальская вода без газа, в стекле.',
+            variants: [{ volume: 530, price: 590, isDefault: true }],
+          },
+          {
+            name: 'Жемчужина Байкала газированная',
+            hue: 'cool',
+            description: 'Природная байкальская вода, газированная, в стекле.',
+            variants: [{ volume: 530, price: 590, isDefault: true }],
           },
         ],
       },

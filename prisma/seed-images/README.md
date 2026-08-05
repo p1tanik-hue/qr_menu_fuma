@@ -44,7 +44,8 @@
 - `chernaya-smorodina-apelsin.jpg` — Чёрная смородина + апельсин
 
 ### Вода
-- `zhemchuzhina-baykala.jpg` — Жемчужина Байкала
+- `zhemchuzhina-baykala-bez-gaza.jpg` — Жемчужина Байкала без газа
+- `zhemchuzhina-baykala-gazirovannaya.jpg` — Жемчужина Байкала газированная
 
 ### Газировка
 - `coca-cola.jpg` — Coca-Cola
