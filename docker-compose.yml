@@ -36,11 +36,16 @@ services:
       LOGIN_LOCK_MINUTES: ${LOGIN_LOCK_MINUTES:-15}
       RUN_SEED: ${RUN_SEED:-false}
       NODE_ENV: production
+    # Hardening: run the container read-only-ish and drop privilege escalation.
+    security_opt:
+      - no-new-privileges:true
     volumes:
       # Persist user-uploaded images across deploys.
       - uploads:/app/public/uploads
     ports:
-      - '3000:3000'
+      # SECURITY: bind to localhost only — NEVER expose the app port to the
+      # internet directly. Put Nginx in front (see deploy/nginx-ip.conf).
+      - '127.0.0.1:3000:3000'
 
 volumes:
   db-data:
