@@ -1,14 +1,14 @@
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 const SIZES = {
-  sm: { mark: 'h-7 w-7 text-base', title: 'text-xl', sub: 'text-[0.55rem] tracking-[0.5em]' },
-  md: { mark: 'h-9 w-9 text-lg', title: 'text-2xl sm:text-3xl', sub: 'text-[0.6rem] sm:text-xs tracking-[0.55em]' },
-  lg: { mark: 'h-12 w-12 text-2xl', title: 'text-4xl sm:text-5xl', sub: 'text-xs sm:text-sm tracking-[0.6em]' },
+  sm: { className: 'h-10', sizes: '42px' },
+  md: { className: 'h-24', sizes: '98px' },
+  lg: { className: 'h-36 sm:h-44', sizes: '(min-width: 640px) 178px, 146px' },
 } as const;
 
 export function Logo({
   className,
-  subtitle = true,
   size = 'md',
 }: {
   className?: string;
@@ -17,24 +17,16 @@ export function Logo({
 }) {
   const s = SIZES[size];
   return (
-    <div className={cn('flex max-w-full flex-col items-center select-none', className)}>
-      <div className="flex items-center gap-3">
-        <span
-          aria-hidden
-          className={cn(
-            'inline-flex items-center justify-center rounded-full border border-gold/40 font-display font-semibold gold-text',
-            s.mark,
-          )}
-        >
-          F
-        </span>
-        <span className={cn('font-display font-semibold tracking-[0.25em] gold-text', s.title)}>
-          FUMA
-        </span>
-      </div>
-      {subtitle && (
-        <span className={cn('mt-1 font-light text-sand-muted', s.sub)}>LOUNGE</span>
-      )}
+    <div className={cn('flex max-w-full items-center justify-center select-none', className)}>
+      <Image
+        src="/logo.png"
+        alt="FUMA LOUNGE"
+        width={377}
+        height={372}
+        sizes={s.sizes}
+        priority={size === 'lg'}
+        className={cn('block w-auto max-w-full object-contain', s.className)}
+      />
     </div>
   );
 }
